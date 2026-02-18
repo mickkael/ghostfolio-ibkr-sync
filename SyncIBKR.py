@@ -115,13 +115,13 @@ def get_diff(old_acts, new_acts):
 class SyncIBKR:
     #IBKRCATEGORY = "66b22c82-a96c-4e4f-aaf2-64b4ca41dda2"
 
-    def __init__(self, ghost_host, ibkrtoken, ibkrquery, ghost_key, ghost_token, ibkr_account_id, ghost_account_name, ghost_currency, ghost_ibkr_platform, mapping_file='mapping.yaml'):
+    def __init__(self, ghost_host, ibkrtoken, ibkrquery, ghost_key, ghost_token, ibkr_account_id, ghost_account_name, ghost_currency, ghost_ibkr_platform, mapping_file='mapping.yaml', sync_from_file):
         self.account_id: Optional[str] = None
+        self.sync_from_file = sync_from_file
         if ghost_token == "" and ghost_key != "":
             self.ghost_token = self.create_ghost_token(ghost_host, ghost_key)
         else:
             self.ghost_token = ghost_token
-
         if self.ghost_token is None or self.ghost_token == "":
             logger.info("No bearer token provided, closing now")
             raise Exception("No bearer token provided")
@@ -142,8 +142,13 @@ class SyncIBKR:
         self.symbol_mapping = config.get('symbol_mapping', {})
 
     def sync_ibkr(self):
-        logger.info("Fetching Query")
-        response = client.download(self.ibkrtoken, self.ibkrquery)
+        if self.sync_from_file:
+            logger.info("Reading Query from file: %s", self.sync_from_file)
+            with open(self.sync_from_file, 'rb') as f:
+                response = f.read()
+        else:
+            logger.info("Fetching Query")
+            response = client.download(self.ibkrtoken, self.ibkrquery)
         #logger.info("Parsing Query:\n%s", response)
         query: FlexQueryResponse = parser.parse(response)
         account_statement = self.get_account_flex_statement(query)
