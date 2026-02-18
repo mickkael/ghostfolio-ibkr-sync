@@ -1,3 +1,5 @@
+
+name: Build Image and push in GHCR
 on:
   workflow_dispatch:
 
