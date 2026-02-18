@@ -115,7 +115,7 @@ def get_diff(old_acts, new_acts):
 class SyncIBKR:
     #IBKRCATEGORY = "66b22c82-a96c-4e4f-aaf2-64b4ca41dda2"
 
-    def __init__(self, ghost_host, ibkrtoken, ibkrquery, ghost_key, ghost_token, ibkr_account_id, ghost_account_name, ghost_currency, ghost_ibkr_platform, mapping_file='mapping.yaml', sync_from_file):
+    def __init__(self, ghost_host, ibkrtoken, ibkrquery, ghost_key, ghost_token, ibkr_account_id, ghost_account_name, ghost_currency, ghost_ibkr_platform, mapping_file='mapping.yaml', sync_from_file=None):
         self.account_id: Optional[str] = None
         self.sync_from_file = sync_from_file
         if ghost_token == "" and ghost_key != "":
