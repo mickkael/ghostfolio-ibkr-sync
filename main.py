@@ -1,6 +1,5 @@
 import logging
 import os
-
 from SyncIBKR import SyncIBKR
 from pretty_print import pretty_print_table
 
@@ -9,9 +8,7 @@ logging.basicConfig(level=logging.INFO, format=template)
 logger = logging.getLogger(__name__)
 
 SYNCIBKR = "SYNCIBKR"
-
 DELETE_ALL_ACTS = "DELETE_ALL_ACTS"
-
 GET_ALL_ACTS = "GET_ALL_ACTS"
 
 ghost_keys = os.environ.get("GHOST_KEY", "").split(",")
@@ -24,7 +21,7 @@ ghost_account_names = os.environ.get("GHOST_ACCOUNT_NAME", "Interactive Brokers"
 ghost_currencies = os.environ.get("GHOST_CURRENCY", "USD").split(",")
 operations = os.environ.get("OPERATION", SYNCIBKR).split(",")
 ghost_ibkr_platforms = os.environ.get("GHOST_IBKR_PLATFORM", "").split(",")
-
+sync_from_files = os.environ.get("SYNC_FROM_FILE", "").split(",")
 
 if __name__ == '__main__':
     for i in range(len(operations)):
@@ -38,8 +35,19 @@ if __name__ == '__main__':
         ghost_currency = ghost_currencies[i] if len(ghost_currencies) > i else ghost_currencies[-1]
         ghost_ibkr_platform = ghost_ibkr_platforms[i] if len(ghost_ibkr_platforms) > i else ghost_ibkr_platforms[-1]
 
+        raw_sync_from_file = sync_from_files[i] if len(sync_from_files) > i else sync_from_files[-1]
+        sync_from_file = raw_sync_from_file.strip() or None  # treat empty/whitespace as None
+
+        if sync_from_file and not os.path.isfile(sync_from_file):
+            logger.error("SYNC_FROM_FILE path does not exist or is not a file: %s", sync_from_file)
+            continue
+
+        if sync_from_file:
+            logger.info("Using local file instead of IBKR download: %s", sync_from_file)
+
         ghost = SyncIBKR(ghost_host, ibkr_token, ibkr_query, ghost_key, ghost_token, ibkr_account_id,
-                         ghost_account_name, ghost_currency, ghost_ibkr_platform)
+                         ghost_account_name, ghost_currency, ghost_ibkr_platform, sync_from_file=sync_from_file)
+
         if operations[i] == SYNCIBKR:
             logger.info("Starting sync for account %s: %s", i, ibkr_account_ids[i] if len(ibkr_account_ids) > i else "Unknown")
             ghost.sync_ibkr()
