@@ -185,20 +185,22 @@ class SyncIBKR:
                     logger.info("trade is not buy or sell (ignoring): %s", trade)
                     continue
                 if trade.assetCategory == "OPT":
-                    activities.append({
-                        "accountId": account_id,
-                        "comment": f"tradeID={trade.tradeID}",
-                        "currency": trade.currency,
-                        "dataSource": "MANUAL",
-                        "date": iso_format,
-                        "fee": abs(float(trade.ibCommission)),
-                        "quantity": abs(float(trade.quantity)),
-                        "symbol": trade.symbol.replace(" ", "-"),
-                        "type": buysell,
-                        "unitPrice": float(trade.tradePrice),
-                        "figi": trade.figi,
-                        "ibkrSymbol": self.symbol_mapping[trade.symbol] if trade.symbol in self.symbol_mapping else trade.symbol
-                    })
+                    # activities.append({
+                    #     "accountId": account_id,
+                    #     "comment": f"tradeID={trade.tradeID}",
+                    #     "currency": trade.currency,
+                    #     "dataSource": "MANUAL",
+                    #     "date": iso_format,
+                    #     "fee": abs(float(trade.ibCommission)),
+                    #     "quantity": abs(float(trade.quantity)),
+                    #     "symbol": trade.symbol.replace(" ", "-"),
+                    #     "type": buysell,
+                    #     "unitPrice": float(trade.tradePrice),
+                    #     "figi": trade.figi,
+                    #     "ibkrSymbol": self.symbol_mapping[trade.symbol] if trade.symbol in self.symbol_mapping else trade.symbol
+                    # })
+                    logger.info("trade is an OPT (ignoring): %s", trade)
+                    continue
                 else:
                     activities.append({
                         "accountId": account_id,
