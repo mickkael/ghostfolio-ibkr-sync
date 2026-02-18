@@ -22,6 +22,7 @@ ghost_currencies = os.environ.get("GHOST_CURRENCY", "USD").split(",")
 operations = os.environ.get("OPERATION", SYNCIBKR).split(",")
 ghost_ibkr_platforms = os.environ.get("GHOST_IBKR_PLATFORM", "").split(",")
 sync_from_files = os.environ.get("SYNC_FROM_FILE", "").split(",")
+mapping_file = os.environ.get("MAPPING_FILE", "").split(",")
 
 if __name__ == '__main__':
     for i in range(len(operations)):
@@ -34,7 +35,7 @@ if __name__ == '__main__':
         ghost_account_name = ghost_account_names[i] if len(ghost_account_names) > i else ghost_account_names[-1]
         ghost_currency = ghost_currencies[i] if len(ghost_currencies) > i else ghost_currencies[-1]
         ghost_ibkr_platform = ghost_ibkr_platforms[i] if len(ghost_ibkr_platforms) > i else ghost_ibkr_platforms[-1]
-
+        mapping_file = mapping_file[i] if len(mapping_file) > i else mapping_file[-1]
         raw_sync_from_file = sync_from_files[i] if len(sync_from_files) > i else sync_from_files[-1]
         sync_from_file = raw_sync_from_file.strip() or None  # treat empty/whitespace as None
 
@@ -46,7 +47,7 @@ if __name__ == '__main__':
             logger.info("Using local file instead of IBKR download: %s", sync_from_file)
 
         ghost = SyncIBKR(ghost_host, ibkr_token, ibkr_query, ghost_key, ghost_token, ibkr_account_id,
-                         ghost_account_name, ghost_currency, ghost_ibkr_platform, sync_from_file=sync_from_file)
+                         ghost_account_name, ghost_currency, ghost_ibkr_platform, mapping_file=mapping_file, sync_from_file=sync_from_file)
 
         if operations[i] == SYNCIBKR:
             logger.info("Starting sync for account %s: %s", i, ibkr_account_ids[i] if len(ibkr_account_ids) > i else "Unknown")
