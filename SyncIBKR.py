@@ -172,7 +172,10 @@ class SyncIBKR:
             elif trade.openCloseIndicator.CLOSE:
                 date = datetime.strptime(str(trade.dateTime), date_format)
                 iso_format = date.isoformat()
-                symbol = self.get_symbol_for_trade(trade, data_source)
+                if trade.assetCategory == "OPT":
+                    logger.info("Trade is an Option %s", trade.subCategory)
+                else:
+                    symbol = self.get_symbol_for_trade(trade, data_source)
 
                 if trade.buySell == BuySell.BUY:
                     buysell = "BUY"
@@ -181,21 +184,37 @@ class SyncIBKR:
                 else:
                     logger.info("trade is not buy or sell (ignoring): %s", trade)
                     continue
-
-                activities.append({
-                    "accountId": account_id,
-                    "comment": f"tradeID={trade.tradeID}",
-                    "currency": trade.currency,
-                    "dataSource": data_source,
-                    "date": iso_format,
-                    "fee": abs(float(trade.ibCommission)),
-                    "quantity": abs(float(trade.quantity)),
-                    "symbol": symbol.replace(" ", "-"),
-                    "type": buysell,
-                    "unitPrice": float(trade.tradePrice),
-                    "figi": trade.figi,
-                    "ibkrSymbol": self.symbol_mapping[trade.symbol] if trade.symbol in self.symbol_mapping else trade.symbol
-                })
+                if trade.assetCategory == "OPT":
+                    activities.append({
+                        "accountId": account_id,
+                        "comment": f"tradeID={trade.tradeID}",
+                        "currency": trade.currency,
+                        "dataSource": "MANUAL",
+                        "date": iso_format,
+                        "fee": abs(float(trade.ibCommission)),
+                        "quantity": abs(float(trade.quantity)),
+                        "symbol": trade.symbol,
+                        "type": buysell,
+                        "unitPrice": float(trade.tradePrice),
+                        "figi": trade.figi,
+                        "ibkrSymbol": self.symbol_mapping[trade.symbol] if trade.symbol in self.symbol_mapping else trade.symbol
+                    })
+                else:
+                    activities.append({
+                        "accountId": account_id,
+                        "comment": f"tradeID={trade.tradeID}",
+                        "currency": trade.currency,
+                        "dataSource": data_source,
+                        "date": iso_format,
+                        "fee": abs(float(trade.ibCommission)),
+                        "quantity": abs(float(trade.quantity)),
+                        "symbol": symbol.replace(" ", "-"),
+                        "type": buysell,
+                        "unitPrice": float(trade.tradePrice),
+                        "figi": trade.figi,
+                        "ibkrSymbol": self.symbol_mapping[trade.symbol] if trade.symbol in self.symbol_mapping else trade.symbol
+                    })
+                    
 
         for dividend in account_statement.ChangeInDividendAccruals:
             if len(dividend.code) != 1:
