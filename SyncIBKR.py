@@ -193,7 +193,7 @@ class SyncIBKR:
                         "date": iso_format,
                         "fee": abs(float(trade.ibCommission)),
                         "quantity": abs(float(trade.quantity)),
-                        "symbol": trade.symbol,
+                        "symbol": trade.symbol.replace(" ", "-"),
                         "type": buysell,
                         "unitPrice": float(trade.tradePrice),
                         "figi": trade.figi,
